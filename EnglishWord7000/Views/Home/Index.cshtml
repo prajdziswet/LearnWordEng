@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@using Support
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+<div class="my_container">
+<br></br>
+<p><strong style="color: #76c300; font-size: 14pt;">Сайт створаны на падмурку трох сайтаў:</strong></p>
+    <p style="color: #76c300;">- Оксвардском слоўніку больш ужывальных слоў (5000, <a href="https://www.oxfordlearnersdictionaries.com/">Oxford</a>) </p>
+    <p style="color: #76c300;">- Перакладзе слова (<a href="https://wooordhunt.ru/">Wooordhunt</a>) </p>
+    <p style="color: #76c300;">- Дададковых прыкладах (<a href="https://context.reverso.net/">Reservo</a>) </p>
+<br></br>
+<p>  
+    @if (User.Identity.Name == null)
+    {
+        <label>Нажаль вы не увайшлі, калі ласка зарэгіструйціся, каб выкарастаць сайт цалкам</label>
+        <a asp-action="Register" asp-controller="Account">Регістрацыя</a><br/>
+        <a asp-action="Login" asp-controller="Account">Уваход</a>
+    }
+    else
+    {
+        <a style="color:#00e2e2" asp-controller="Home" asp-action="Learn">Перайсці да адукацыі</a>
+    }
+
+</p>
+</div>

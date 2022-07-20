@@ -1,0 +1,29 @@
+﻿@model EnglishWord7000.Models.RegisterModel
+ 
+<h2>Змена логіна-Eмейла</h2>
+ 
+<form asp-action="Login" asp-controller="Progress" asp-anti-forgery="true">
+    <div class="validation" asp-validation-summary="ModelOnly"></div>
+    <div>
+        <div>
+            <label asp-for="Login">Введите Login</label><br/>
+            <input type="text" asp-for="Login" value="@ViewData["Name"]"/>
+            <span asp-validation-for="Login"/>
+        </div>
+        <div>
+            <label asp-for="Email">Введите Email</label><br/>
+            <input type="text" asp-for="Email" value="@ViewData["Email"]"/>
+            <span asp-validation-for="Email"/>
+        </div>
+        <div>
+            <input type="hidden" asp-for="Password" value="closefiled"/>
+        </div>
+        <div>
+            <input type="hidden" asp-for="PasswordConfirm" value="closefiled"/>
+        </div>
+        <div>
+            <input type="submit" style="background: #2a2e32; color: azure; border: 4px outset wheat;" value="Змяніць"/>
+        </div>
+    </div>
+</form>
+<form><button asp-action="Index">Вярнуцца</button></form>

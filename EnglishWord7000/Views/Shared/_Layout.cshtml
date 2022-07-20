@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EnglishWord 5000 </title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/EnglishWord7000.styles.css" asp-append-version="true" />
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">EnglishWord 5000</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                    </li>
+                    @if (User.Identity.Name != null)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Learn" asp-action="Index">Learn</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Progress" asp-action="Index">Login/Progress</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="dropdown">
+
+                @if (User.Identity.Name == null)
+                {
+                    <button class="btn dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" style="margin-left: 100px;">
+                        SignIn
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item active" asp-controller="Account" asp-action="Login">Уваход</a></li>
+                        <li><a class="dropdown-item" asp-controller="Account" asp-action="Register">Рэгістрація</a></li>
+                    </ul>
+                }
+                else
+                {
+                    <button class="btn dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" style="color: greenyellow; margin-left: 100px;">
+                        @User.Identity.Name
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item active" asp-controller="Account" asp-action="Logout">Выхад</a></li>
+                    </ul>
+                }
+            </div>
+        </div>
+    </nav>
+</header>
+
+    <div class="main-container">
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+    </div>
+
+<footer class="border-top footer text-muted">
+    <div class="container">
+            &copy; 2022 - EnglishWord5000 - prajdziswet
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"></script>
+        @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
