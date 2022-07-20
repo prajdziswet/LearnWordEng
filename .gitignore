@@ -6,8 +6,8 @@
 # Build results
 **/[Bb]in/
 **/[Oo]bj/
-EnglishWord7000/*.mdf
-EnglishWord7000/*.ldf
+*.mdf
+*.ldf
 .git/
 .vs/
 
