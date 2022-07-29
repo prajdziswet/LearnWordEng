@@ -1,6 +1,6 @@
-﻿@{
-    ViewData["Title"] = "Privacy Policy";
-}
-<h1>@ViewData["Title"]</h1>
-
-<p>Use this page to detail your site's privacy policy.</p>
+﻿<div class="my_container">
+    @Html.Raw(@ViewData["Page"])
+</div>
+<div class="my_buttons">
+    <a asp-action="Index" asp-route-id="1">Next</a>
+</div>

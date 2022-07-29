@@ -102,40 +102,44 @@ h1, h2.h, h1.headword .st {
     display: block;
     background-color: #2a2e32;
     color: #85c91c;
+    top: auto;
 }
 
 .entry {
     width: 40%;
     float: left;
+    margin-right: 1%;
+    margin-left: 1%;
 }
 
 #wd {
     width: 40%;
     float: left;
-    margin-left: 3%;
+    margin-right: 1%;
+    margin-left: 1%;
 }
 .my_container {
-    width: 100%;
+    width: 82%;
     /*background-color: #2a2e32;*/
     color: #85c91c;
     float: left;
-    margin-left: 5%;
-    margin-right: 5%;
+    margin-left: 1%;
+    margin-right: 1%;
     margin-top: 0px;
     top: auto;
 }
 
 .my_buttons {
-    width: 11%;
+    width: 10%;
     float: left;
-    margin-left: 5%;
+    margin-left: 3%;
     margin-right: 3%;
     margin-top: 50px;
     top: auto;
 }
 
 .footer {
-    top: 93%;
+    top: 100%;
 }
 
 .tr, .phrases, .similar_words {
