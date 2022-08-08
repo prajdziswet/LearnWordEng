@@ -116,4 +116,11 @@ if ($"https://context.reverso.net/translation/english-russian/{wordEng}".ExitURL
 
         }
     }
+
+    public static string DeleteWordNeedTranslate(string wordRu)
+    {
+        string regex = "<h3 style=\"margin-bottom:10px\">Примеры, ожидающие перевода.+?(?=<h3)";
+        return Regex.Replace(wordRu, regex,"");
+    }
+
 }

@@ -25,14 +25,21 @@ namespace EnglishWord7000.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email || u.Login == model.Email && u.Password == model.Password);
+                User user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email || u.Login == model.Email);
                 if (user != null)
                 {
-                    await Authenticate(model.Email); // аутентификация
+                    user = await db.Users.FirstOrDefaultAsync(u =>
+                        u.Email == model.Email || u.Login == model.Email && u.Password == model.Password);
 
-                    return RedirectToAction("Index", "Home");
+                    if (user != null)
+                    {
+                        await Authenticate(user.Login); // аутентификация
+
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else ModelState.AddModelError("", "Не карэктны пароль");
                 }
-                ModelState.AddModelError("", "Некорректные логин/email и(или) пароль");
+                ModelState.AddModelError("", "Такога логіна/email не існуе");
             }
             return View(model);
         }
@@ -54,16 +61,16 @@ namespace EnglishWord7000.Controllers
                     User newuser = new User { Login = model.Login, Email = model.Email, Password = model.Password };
                     db.Users.Add(newuser);
                     db.StatusLearns.Add(new StatusLearn { User = newuser, level = Levels.levels.First() });
-                    await db.SaveChangesAsync();
+                    db.SaveChanges();
 
-                    await Authenticate(model.Email); // аутентификация
+                    await Authenticate(model.Login); // аутентификация
 
                     return RedirectToAction("Index", "Home");
                 }
                 else if (user.Login == model.Login)
-                    ModelState.AddModelError("Login", "Некорректные логин, it's exist");
+                    ModelState.AddModelError("Login", "Некарэктны логін, it's exist");
                 else
-                    ModelState.AddModelError("Email", "Некорректные Email, it's exist");
+                    ModelState.AddModelError("Email", "Некарэктны Email, it's exist");
             }
             return View(model);
         }

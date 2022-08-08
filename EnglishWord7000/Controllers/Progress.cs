@@ -22,7 +22,7 @@ namespace EnglishWord7000.Controllers
 
         public IActionResult Index()
         {
-            StatusLearn statusLearn = dbContext.StatusLearns.Where(x => x.User.Email == User.Identity.Name).Include(x => x.User).Include(x => x.LearnWords).FirstOrDefault();
+            StatusLearn statusLearn = dbContext.StatusLearns.Where(x => x.User.Login == User.Identity.Name).Include(x => x.User).Include(x => x.LearnWords).FirstOrDefault();
             ViewData["Name"] = statusLearn.User.Login;
             ViewData["level"] = statusLearn.level;
             ViewData["count"] = statusLearn.LearnWords.Count;

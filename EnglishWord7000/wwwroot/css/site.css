@@ -149,3 +149,7 @@ h1, h2.h, h1.headword .st {
 .more_up, .more_down {
     color: coral;
 }
+
+.validation-summary-errors {
+    color: red;
+}

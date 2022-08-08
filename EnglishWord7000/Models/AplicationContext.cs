@@ -24,6 +24,8 @@ public class AplicationContext:DbContext
     }*/
 
     public DbSet<Word> Words { get; set; }
+    public DbSet<WordEng> WordEng { get; set; }
+    public DbSet<Translate> Translate { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<StatusLearn> StatusLearns { get; set; }
 }

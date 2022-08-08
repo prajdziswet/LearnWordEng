@@ -43,11 +43,7 @@ namespace Support
     {
 
         [Key]
-        public int Id
-        {
-            get;
-            set;
-        }
+        public int Id { get; set; }
         public WordEng WordEng { get; set; }
         public Translate WordRu { get; set; }
         public List<CheckWord> CheckWords { get; set; }

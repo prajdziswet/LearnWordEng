@@ -126,5 +126,11 @@ namespace Support
             else return link;
         }
 
+        public static string DeleteMarkImage(string wordEng)
+        {
+            string regex = "<span class=\"ox-enlarge-label\">enlarge image</span>";
+            return wordEng.Replace(regex,"");
+        }
+
     }
 }
