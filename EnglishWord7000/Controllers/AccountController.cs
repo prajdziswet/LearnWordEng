@@ -60,7 +60,7 @@ namespace EnglishWord7000.Controllers
                     // добавляем пользователя в бд
                     User newuser = new User { Login = model.Login, Email = model.Email, Password = model.Password };
                     db.Users.Add(newuser);
-                    db.StatusLearns.Add(new StatusLearn { User = newuser, level = Levels.levels.First() });
+                    db.PropertyUsers.Add(new PropertyUser { User = newuser, level = Levels.levels.First() });
                     db.SaveChanges();
 
                     await Authenticate(model.Login); // аутентификация

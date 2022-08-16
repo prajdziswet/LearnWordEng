@@ -11,8 +11,7 @@ namespace EnglishWord7000.Controllers
     [Authorize]
     public class Learn : Controller
     {
-        private static LearnWordPage learnWordPage;
-
+        private LearnWordPage learnWordPage;
 
         public Learn(AplicationContext DB, IHttpContextAccessor contextAccessor)
         {
@@ -22,6 +21,12 @@ namespace EnglishWord7000.Controllers
         {
             if (id!=null) learnWordPage.NextIndex();
             @ViewData["Page"]= learnWordPage.GetPage();
+            return RedirectToAction("LearnWord");
+            //return View();
+        }
+
+        public IActionResult LearnWord(int? id)
+        {
             return View();
         }
     }

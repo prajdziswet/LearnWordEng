@@ -22,17 +22,6 @@ namespace EnglishWord7000.Controllers
                 return View();
         }
 
-        //private void AddnewWords(IList<Word> addList,List<Word> allword)
-        //{
-        //    foreach (var element in addList)
-        //    {
-        //        Word newWord=new Word();
-        //        newWord.WordEng = element.WordEng;
-        //        newWord.WordRu = element.WordRu;
-        //        newWord.CheckWords =element.CheckWords;
-        //        allword.Add(newWord);
-        //    }
-        //}
 
             [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
