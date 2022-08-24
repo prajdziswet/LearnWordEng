@@ -11,22 +11,35 @@ namespace EnglishWord7000.Controllers
     [Authorize]
     public class Learn : Controller
     {
-        private LearnWordPage learnWordPage;
+        //private LearnWordPageOld learnWordPage;
+        private AplicationContext DB;
 
         public Learn(AplicationContext DB, IHttpContextAccessor contextAccessor)
         {
-            if (learnWordPage==null) { learnWordPage = new LearnWordPage(DB, contextAccessor); }
+            this.DB = DB;
+            //if (learnWordPage==null) { learnWordPage = new LearnWordPageOld(DB, contextAccessor); }
         }
         public IActionResult Index(int? id)
         {
-            if (id!=null) learnWordPage.NextIndex();
-            @ViewData["Page"]= learnWordPage.GetPage();
+            //if (id!=null) learnWordPage.NextIndex();
+            //@ViewData["Page"]= learnWordPage.GetPage();
+            Word word=DB.Words.Find(14400);
+            
             return RedirectToAction("LearnWord");
             //return View();
         }
 
-        public IActionResult LearnWord(int? id)
+        public IActionResult LearnWord(uint? id=null)
         {
+                //@ViewData["Page"] = learnWordPage.GetPage(id);
+                //if (id == 0)
+                //{
+                //    id = null;
+                //    return RedirectToAction("LearnWord");
+                //}
+                //@ViewData["id"] = id;
+                //@ViewData["listAddition"] = learnWordPage.GetLinkAdditionWord();
+
             return View();
         }
     }

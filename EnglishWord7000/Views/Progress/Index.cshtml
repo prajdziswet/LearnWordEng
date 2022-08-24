@@ -1,13 +1,13 @@
 ﻿<div class="my_container">
     <br></br>
     <p>
-        Name: @ViewData["Name"]
+        Name: @User.Identity.Name 
     </p>
     <p>
-        email: @User.Identity.Name
+        email:@ViewData["Email"]
     </p>
     <p>Level: @ViewData["level"]</p>
-    <p>Count: @ViewData["Count"]</p>
+    <p>Count: @ViewData["Learned"]</p>
     <div>
         <a style="display: inline-block; border-radius: 3px; background-color: #1370c3; color: #cacacb; ; text-decoration: none;" asp-action="Login" asp-controller="Progress"> Змяніць Name/Email </a>
         <a style="display: inline-block; border-radius: 3px; background-color: #1370c3; color: #cacacb; ; text-decoration: none;" asp-controller="Progress" asp-action="Password"> Змяніць Password </a>

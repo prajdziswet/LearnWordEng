@@ -2,8 +2,28 @@
     <script src="~/js/site.js"></script>
 }
 <div class="my_container">
-    @Html.Raw(@ViewData["Page"])
+    @if (@ViewData["Page"] != null)
+    {
+        @Html.Raw(@ViewData["Page"]);
+    }
+    else
+    {
+        <h3>Вы запомнілі патрэбую колькасць слоу на сення</h3>
+    }
+    
 </div>
 <div class="my_buttons">
-    <a asp-action="Index" asp-route-id="1">Next</a>
+    @if (@ViewData["id"] == null)
+    {
+        @Html.Raw(@ViewData["listAddition"]);
+    }
+    @if (@ViewData["id"] == null)
+    {
+        <a asp-action="LearnWord" asp-route-id="0">Запомні-ў(-ла) (Next)</a>
+    }
+    else
+    {
+        <a asp-action="LearnWord">Вярнуцца</a>
+    }
+    
 </div>

@@ -17,15 +17,15 @@ namespace EnglishWord7000.Controllers
         public Progress (AplicationContext dbContext, IHttpContextAccessor contextAccessor)
         {
             this.dbContext = dbContext;
-            user = dbContext.Users.FirstOrDefault(x => x.Email == contextAccessor.HttpContext.User.Identity.Name);
+            user = dbContext.Users.FirstOrDefault(x => x.Login == contextAccessor.HttpContext.User.Identity.Name);
         }
 
         public IActionResult Index()
         {
-            StatusLearn statusLearn = dbContext.StatusLearns.Where(x => x.User.Login == User.Identity.Name).Include(x => x.User).Include(x => x.LearnWords).FirstOrDefault();
-            ViewData["Name"] = statusLearn.User.Login;
-            ViewData["level"] = statusLearn.level;
-            ViewData["count"] = statusLearn.LearnWords.Count;
+            PropertyUser propertyUser = dbContext.PropertyUsers.Where(x => x.User.Login == User.Identity.Name).FirstOrDefault();
+            ViewData["Email"] = user.Email;
+            ViewData["level"] = propertyUser.level;
+            ViewData["Learned"] = propertyUser.StartLearn;
             return View();
         }
         [HttpGet]
