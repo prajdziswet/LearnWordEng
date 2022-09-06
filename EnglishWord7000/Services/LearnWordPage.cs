@@ -4,49 +4,7 @@ using Support;
 
 namespace EnglishWord7000.Services
 {
-    public interface IGetCookies
-    {
-        public int Id{ get;}
-        public int? count { get; }
-
-    }
-    public class GetCookies : IGetCookies
-    {
-        public  int Id { get; }
-        public int? count { get; }
-
-        public GetCookies(IRequestCookieCollection requestCookies)
-        {
-            if (requestCookies.ContainsKey("count"))
-            {
-                count= Int32.Parse(requestCookies["count"]);
-                Id = Int32.Parse(requestCookies["Id"]);
-
-            }
-            else count = null;
-        }
-    }
-
-    public interface ISetCookies
-    {
-        public void Set(int Id, int count);
-    }
-    public class SetCookies:ISetCookies
-    {
-        private IResponseCookies responseCookies;
-        public SetCookies(IResponseCookies responseCookies)
-        {
-            this.responseCookies = responseCookies;
-        }
-
-        public void Set(int Id,int count)
-        {
-            responseCookies.Append("Id", Id.ToString());
-            responseCookies.Append("count", count.ToString());
-        }
-    }
-
-    public class LearnWordPage
+    public class LearnWordPage:ILearnWordPage
     {
         private AplicationContext Db;
         private int Id;
@@ -55,23 +13,25 @@ namespace EnglishWord7000.Services
         private PropertyUser propertyUser;
         private Levels levels;
         private ISetCookies setCookies;
+        private IGetCookies getCookies;
         private Word word { get;  set; }
         private List<Tuple<int, string>> linkAdditionWord;
 
 
-        public LearnWordPage(AplicationContext Db, IHttpContextAccessor contextAccessor, IGetCookies GetCookies, ISetCookies setCookies)
+        public LearnWordPage(AplicationContext Db, IHttpContextAccessor contextAccessor)
         {
             this.Db = Db;
-            this.setCookies=setCookies;
-            user = Db.Users.AsNoTracking().FirstOrDefault(x => x.Login == contextAccessor.HttpContext.User.Identity.Name);
+            this.setCookies=new SetCookies(contextAccessor.HttpContext.Response.Cookies);
+            getCookies = new GetCookies(contextAccessor.HttpContext.Request.Cookies);
+            user = Db.Users.FirstOrDefault(x => x.Login == contextAccessor.HttpContext.User.Identity.Name);
             if (user!=null)
             {
                 propertyUser = Db.PropertyUsers.FirstOrDefault(x => x.User == user);
                 levels = new Levels(propertyUser.level);
-                if (GetCookies.count.HasValue)
+                if (getCookies.count.HasValue)
                 {
-                    Id= GetCookies.Id;
-                    count = GetCookies.count.Value;
+                    Id= getCookies.Id;
+                    count = getCookies.count.Value;
                 }
                 PrepareThisClass();
             }
@@ -95,7 +55,7 @@ namespace EnglishWord7000.Services
         {
             if (Id!=0)
             {
-            word = Db.Words.AsNoTracking().Include(x=>x.WordEng).Include(x=>x.CheckWords).Include(x=>x.WordRu).FirstOrDefault(x => x.Id == Id);
+            word = Db.Words.Include(x=>x.WordEng).Include(x=>x.CheckWords).Include(x=>x.WordRu).FirstOrDefault(x => x.Id == Id);
 
             if (word!=null) linkAdditionWord = Db.Words.AsNoTracking().Skip(levels.FinishLevel)
                     .Take(levels.FinishAddWord - levels.FinishLevel).Where(x => x.WordEng.Word == word.WordEng.Word)
@@ -104,7 +64,7 @@ namespace EnglishWord7000.Services
 
         }
 
-        public string GetRawPage(uint id = 0)
+        public string GetRawPage(int id=0)
         {
             if (Id != 0&&id==0)
             {
@@ -139,6 +99,7 @@ namespace EnglishWord7000.Services
         {
             if (count < propertyUser.WordLearn)
             {
+                count++;
                 SaveChange();
                 return true;
             }
@@ -147,7 +108,7 @@ namespace EnglishWord7000.Services
 
         private void SetCountFist()
         {
-            count=Db.LearnWord.Where(x => x.FistTime.Date == DateTime.Now.Date && x.User == user).Count();
+            count=Db.LearnWord.Where(x => x.User == user).AsEnumerable().Where(x => x.FistTime.Date == DateTime.Now.Date).Count();
         }
 
         private void SetIdWord()
@@ -157,9 +118,23 @@ namespace EnglishWord7000.Services
 
         private void SaveChange()
         {
-            propertyUser.StartLearn++;
+            LearnWord learnWord = new LearnWord()
+            {
+                learnedWord = word,
+                Repeat = 0,
+                User = user,
+                FistTime = DateTime.Now
+            };
+            Db.LearnWord.Add(learnWord);
+            if (levels.FinishLevel >= propertyUser.StartLearn + 1)
+                propertyUser.StartLearn++;
+            else
+            {
+                levels.Next();
+                propertyUser.level = levels.Level;
+                propertyUser.StartLearn = levels.StartLevel;
+            }
             Db.SaveChanges();
-            count++;
             SetIdWord();
             SetCookies();
         }

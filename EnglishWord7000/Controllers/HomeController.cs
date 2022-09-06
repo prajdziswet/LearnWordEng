@@ -10,12 +10,15 @@ namespace EnglishWord7000.Controllers
 {
     public class HomeController : Controller
     {
-        public HomeController()
+        private IRepeatWordPage repeatWordPage;
+        public HomeController(IRepeatWordPage repeatWordPage)
         {
+            this.repeatWordPage = repeatWordPage;
         }
 
         public IActionResult Index()
         {
+            ViewBag.repeat = repeatWordPage.ExistPage;
                 return View();
         }
 

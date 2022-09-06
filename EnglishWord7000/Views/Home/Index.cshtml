@@ -19,7 +19,15 @@
     }
     else
     {
-        <a style="color:#00e2e2" asp-controller="Learn" asp-action="Index">Перайсці да адукацыі</a>
+        @if (ViewBag.repeat)
+        {
+            <a style="color:#00e2e2" asp-controller="Learn" asp-action="Repeat">Перайсці да паўтору</a>
+        }
+        else
+        {
+            <a style="color:#00e2e2" asp-controller="Learn" asp-action="LearnWord">Перайсці да адукацыі</a>
+        }
+        
     }
 
 </p>

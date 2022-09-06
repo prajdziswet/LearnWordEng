@@ -14,6 +14,11 @@ builder.Services.AddDbContext<AplicationContext>(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IRepeatWordPage, RepeatWordPage>();
+//builder.Services.AddTransient<ISetCookies, SetCookies>();
+//builder.Services.AddTransient<IGetCookies, GetCookies>();
+//builder.Services.AddTransient<ILearnWordPage, LearnWordPage>();
+
 
 var app = builder.Build();
 

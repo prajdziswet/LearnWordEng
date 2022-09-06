@@ -1,0 +1,15 @@
+﻿<div class="my_container">
+    @Html.Raw(ViewData["page"]);
+</div>
+<div class="my_buttons">
+    @if (@ViewData["Page"]!=null)
+    {
+    <form>
+        <input type="hidden" asp-boolit="true"/>
+        <button type="submit">Запомніў</button>
+    </form>
+    }
+</div>
+@section Scripts {
+    <script src="~/js/Repeat.js"></script>
+}

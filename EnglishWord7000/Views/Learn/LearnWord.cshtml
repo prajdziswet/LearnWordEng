@@ -1,7 +1,4 @@
-﻿@section Scripts {
-    <script src="~/js/site.js"></script>
-}
-<div class="my_container">
+﻿<div class="my_container">
     @if (@ViewData["Page"] != null)
     {
         @Html.Raw(@ViewData["Page"]);
@@ -13,17 +10,28 @@
     
 </div>
 <div class="my_buttons">
-    @if (@ViewData["id"] == null)
+    @if (@ViewData["Page"] != null)
     {
-        @Html.Raw(@ViewData["listAddition"]);
+
+@if ((int)@ViewData["id"] == 0)
+{
+    @Html.Raw(@ViewData["listAddition"])
+    ;
+}
+        @if ((int)@ViewData["id"] == 0)
+        {
+            <form method="post">
+                <button type="submit">Запомні-ў(-ла) (Next)</button>
+            </form>
+        }
+        else
+        {
+            <a asp-action="LearnWord">Вярнуцца</a>
+        }
     }
-    @if (@ViewData["id"] == null)
-    {
-        <a asp-action="LearnWord" asp-route-id="0">Запомні-ў(-ла) (Next)</a>
-    }
-    else
-    {
-        <a asp-action="LearnWord">Вярнуцца</a>
-    }
-    
+
 </div>
+
+@section Scripts {
+    <script src="~/js/site.js"></script>
+}

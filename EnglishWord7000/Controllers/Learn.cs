@@ -11,35 +11,62 @@ namespace EnglishWord7000.Controllers
     [Authorize]
     public class Learn : Controller
     {
-        //private LearnWordPageOld learnWordPage;
-        private AplicationContext DB;
+        private IRepeatWordPage repeatWordPage;
+        private ILearnWordPage learnWordPage=null;
+        private AplicationContext Db;
 
-        public Learn(AplicationContext DB, IHttpContextAccessor contextAccessor)
+        public Learn(IRepeatWordPage repeatWordPage, AplicationContext Db, IHttpContextAccessor contextAccessor)
         {
-            this.DB = DB;
-            //if (learnWordPage==null) { learnWordPage = new LearnWordPageOld(DB, contextAccessor); }
+            this.repeatWordPage = repeatWordPage;
+            if (!repeatWordPage.ExistPage) learnWordPage = new LearnWordPage(Db,contextAccessor);
         }
-        public IActionResult Index(int? id)
+        public IActionResult Index()
         {
-            //if (id!=null) learnWordPage.NextIndex();
-            //@ViewData["Page"]= learnWordPage.GetPage();
-            Word word=DB.Words.Find(14400);
-            
-            return RedirectToAction("LearnWord");
-            //return View();
+            if (repeatWordPage.ExistPage) return Redirect("Repeat");
+            else return Redirect("Learn/LearnWord");
         }
 
-        public IActionResult LearnWord(uint? id=null)
+        [HttpGet]
+        public IActionResult LearnWord(int id=0)
         {
-                //@ViewData["Page"] = learnWordPage.GetPage(id);
-                //if (id == 0)
-                //{
-                //    id = null;
-                //    return RedirectToAction("LearnWord");
-                //}
-                //@ViewData["id"] = id;
-                //@ViewData["listAddition"] = learnWordPage.GetLinkAdditionWord();
+            if (learnWordPage!=null)
+            {
+            @ViewData["Page"] = learnWordPage.GetRawPage(id);
+            @ViewData["id"] = id;
+            @ViewData["listAddition"] = learnWordPage.GetLinkAdditionWords();
+            }
+            return View();
+        }
 
+        [HttpPost]
+        public IActionResult LearnWord()
+        {
+            if (learnWordPage.Next())
+            {
+            @ViewData["Page"] = learnWordPage.GetRawPage(0);
+            @ViewData["id"] = 0;
+            @ViewData["listAddition"] = learnWordPage.GetLinkAdditionWords();
+            }
+
+
+            return View();
+        }
+
+        public IActionResult Repeat(bool boolit=false)
+        {
+            if (boolit)
+            {
+                repeatWordPage.Next();
+                boolit = false;
+            }
+            if (repeatWordPage.ExistPage)
+            {
+                @ViewData["Page"] = repeatWordPage.GetPage();
+            }
+            else
+            {
+                return Redirect("LearnWord");
+            }
             return View();
         }
     }

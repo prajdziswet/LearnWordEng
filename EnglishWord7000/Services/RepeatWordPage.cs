@@ -6,39 +6,67 @@ using Support;
 
 namespace EnglishWord7000.Services;
 
-public class RepeatWordPage
+public class RepeatWordPage: IRepeatWordPage
 {
     #region Value
-    private AplicationContext DbContext { get; set; }
-    private List<LearnWord> LearnWords { get; set; }
+    private AplicationContext Db { get; set; }
+    private User user;
+    private LearnWord learnWord { get; set; }
 
-    private bool ExistPage
+    public bool ExistPage
     {
-        get
-        {
-            if (LearnWords.Count == 0) return false;
-            else return true;
-        }
+        get;
+        private set;
     }
     #endregion
 
-
-
-    public RepeatWordPage(AplicationContext DB, string UserName)
-    {
-        if (UserName.IsNullOrEmpty()) throw new ArgumentNullException("UserName in RepeatWordPage");
-        DbContext = DB;
-
-        LearnWords = DbContext.LearnWord.Where(x => x.User.Login == UserName&& x.FistTime != null && x.FistTime <= DateTime.Now.AddDays(-1) && x.Repeat == 1).Include(y =>
-            y.learnedWord).ToList();
+    public RepeatWordPage(AplicationContext DB, IHttpContextAccessor contextAccessor)
+    {       
+        this.Db= DB;
+        user = Db.Users.AsNoTracking().FirstOrDefault(x => x.Login == contextAccessor.HttpContext.User.Identity.Name);
+        GetLearnedWord();
     }
 
     public string GetPage()
     {
         if (ExistPage)
         {
-            return null;
+            string strReturn = "";
+            if (learnWord == null && learnWord.learnedWord.CheckWords.Count > 0)
+            {
+                foreach (CheckWord element in learnWord.learnedWord.CheckWords)
+                {
+                    strReturn += "<div class=\"checkword\"" +
+                                 "<span class=\"eng\">" +
+                                 $"{element.EngPhrase}" +
+                                 "</span>" +
+                                 "<span class=\"ru\">   " +
+                                 $"{element.RuPhrase}" +
+                                 "</span>" +
+                                 "</div><br/>";
+                }
+            }
+            return strReturn;
         }
-        else return null;
+        else return "";
+    }
+
+    public void Next()
+    {
+        learnWord.Repeat++;
+        Db.SaveChanges();
+        GetLearnedWord();
+    }
+
+    private void GetLearnedWord()
+    {
+        if (user != null)
+        {
+            learnWord = Db.LearnWord.Where(x => x.User == user && x.Repeat == 1).Include(y =>
+                y.learnedWord).AsEnumerable().FirstOrDefault(x => x.FistTime <= DateTime.Now.AddDays(-1));
+        }
+
+        if (user == null || learnWord == null) ExistPage = false;
+        else ExistPage = true;
     }
 }
