@@ -78,7 +78,7 @@ public class WriteInHtmlRu
             {
                 eng = collOriginal[i].InnerText;
                 ru = collTranslate[i].InnerText;
-                if (eng.IsNullOrEmpty() && ru.IsNullOrEmpty())
+                if (!eng.IsNullOrEmpty() && !ru.IsNullOrEmpty())
                 {
                     CheckWord newCheckWord = new CheckWord();
                     newCheckWord.RuPhrase = ru;
@@ -92,7 +92,7 @@ public class WriteInHtmlRu
     private void AdditionListRu()
     {
         string adress = $"https://context.reverso.net/translation/english-russian/{wordEng}";
-if ($"https://context.reverso.net/translation/english-russian/{wordEng}".ExitURL()) {
+if (adress.ExitURL()) {
         Requst requst = new Requst($"https://context.reverso.net/translation/english-russian/{wordEng}");
         string response = requst.Response;
         HtmlDocument htmlDoc = new HtmlDocument();
@@ -104,7 +104,7 @@ if ($"https://context.reverso.net/translation/english-russian/{wordEng}".ExitURL
         {
             string eng = Block.SelectSingleNode("//div[@class='src ltr']").InnerText;
             string ru = Block.SelectSingleNode("//div[@class='trg ltr']").InnerText;
-            if (eng.IsNullOrEmpty() && ru.IsNullOrEmpty())
+            if (!eng.IsNullOrEmpty() && !ru.IsNullOrEmpty())
             {
                 CheckWord newCheckWord = new CheckWord();
                 newCheckWord.RuPhrase = ru;
@@ -121,6 +121,45 @@ if ($"https://context.reverso.net/translation/english-russian/{wordEng}".ExitURL
     {
         string regex = "<h3 style=\"margin-bottom:10px\">Примеры, ожидающие перевода.+?(?=<h3)";
         return Regex.Replace(wordRu, regex,"");
+    }
+
+    public static List<CheckWord> ReturnList(string html)
+    {
+        List<CheckWord> retList =new List<CheckWord>();
+
+        var divCollection = Regex.Matches(html, @"<div class=""ex.*?"".*?>(.*?)<\/div>");
+        bool block = false;
+        if (divCollection != null)
+        {
+            divCollection= Regex.Matches(html, @"<div class=""block phra.*?>(.*?)<\/div>");
+            block = true;
+        }
+
+
+        if (divCollection!=null)
+        foreach (Match div in divCollection)
+        {
+            if (div.Groups.Count >= 1)
+            {
+                string str=div.Groups[1].Value;
+                var collection = Regex.Matches(str, @"(.*?)<i>(.*?)<\/i>");
+                if (collection!=null)
+                    foreach (Match element in collection)
+                    {
+                            if (element.Groups.Count>=2)
+                            {
+                                string eng;
+                                    if (!block)
+                                    eng= (element.Groups[1].Value.IndexOf(">") >= 0) ? element.Groups[1].Value.Remove(0, element.Groups[1].Value.IndexOf(">")) : element.Groups[1].Value;
+                                    else eng= element.Groups[1].Value;
+                                string ru = element.Groups[2].Value;
+                                CheckWord checkWord=new CheckWord(){EngPhrase = eng,RuPhrase = ru};
+                                retList.Add(checkWord);
+                            }
+                    }
+            }
+        }
+        return retList;
     }
 
 }

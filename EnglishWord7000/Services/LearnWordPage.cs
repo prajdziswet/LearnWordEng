@@ -108,7 +108,7 @@ namespace EnglishWord7000.Services
 
         private void SetCountFist()
         {
-            count=Db.LearnWord.Where(x => x.User == user).AsEnumerable().Where(x => x.FistTime.Date == DateTime.Now.Date).Count();
+            count=Db.LearnWord.Where(x => x.User == user&&x.FistTime.Date == DateTime.Now.Date).Count();
         }
 
         private void SetIdWord()
@@ -123,7 +123,7 @@ namespace EnglishWord7000.Services
                 learnedWord = word,
                 Repeat = 0,
                 User = user,
-                FistTime = DateTime.Now
+                FistTime = DateTime.Now.Date
             };
             Db.LearnWord.Add(learnWord);
             if (levels.FinishLevel >= propertyUser.StartLearn + 1)

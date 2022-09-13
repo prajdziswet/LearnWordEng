@@ -62,8 +62,8 @@ public class RepeatWordPage: IRepeatWordPage
     {
         if (user != null)
         {
-            learnWord = Db.LearnWord.Where(x => x.User == user && x.Repeat == 1).Include(y =>
-                y.learnedWord).AsEnumerable().FirstOrDefault(x => x.FistTime <= DateTime.Now.AddDays(-1));
+            learnWord = Db.LearnWord.Include(y =>
+                y.learnedWord).FirstOrDefault(x => x.User == user && x.Repeat == 0&&x.FistTime <= DateTime.Now.AddDays(-1).Date);
         }
 
         if (user == null || learnWord == null) ExistPage = false;

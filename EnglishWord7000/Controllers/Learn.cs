@@ -19,10 +19,11 @@ namespace EnglishWord7000.Controllers
         {
             this.repeatWordPage = repeatWordPage;
             if (!repeatWordPage.ExistPage) learnWordPage = new LearnWordPage(Db,contextAccessor);
+            ViewBag.repeat = repeatWordPage.ExistPage;
         }
         public IActionResult Index()
         {
-            if (repeatWordPage.ExistPage) return Redirect("Repeat");
+            if (repeatWordPage.ExistPage) return Redirect("Learn/Repeat");
             else return Redirect("Learn/LearnWord");
         }
 
@@ -31,9 +32,7 @@ namespace EnglishWord7000.Controllers
         {
             if (learnWordPage!=null)
             {
-            @ViewData["Page"] = learnWordPage.GetRawPage(id);
-            @ViewData["id"] = id;
-            @ViewData["listAddition"] = learnWordPage.GetLinkAdditionWords();
+                SetViewDataLearnWord(id);
             }
             return View();
         }
@@ -43,13 +42,17 @@ namespace EnglishWord7000.Controllers
         {
             if (learnWordPage.Next())
             {
-            @ViewData["Page"] = learnWordPage.GetRawPage(0);
-            @ViewData["id"] = 0;
-            @ViewData["listAddition"] = learnWordPage.GetLinkAdditionWords();
+                SetViewDataLearnWord();
             }
 
-
             return View();
+        }
+
+        private void SetViewDataLearnWord(int id = 0)
+        {
+            @ViewData["Page"] = learnWordPage.GetRawPage(id);
+            @ViewData["id"] = id;
+            @ViewData["listAddition"] = learnWordPage.GetLinkAdditionWords();
         }
 
         public IActionResult Repeat(bool boolit=false)
@@ -65,7 +68,7 @@ namespace EnglishWord7000.Controllers
             }
             else
             {
-                return Redirect("LearnWord");
+                return Redirect("Learn/LearnWord");
             }
             return View();
         }

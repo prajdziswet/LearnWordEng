@@ -19,7 +19,7 @@ public class LearnWord
     public Word learnedWord { get; set; }
     public User User { get; set; }
     public int Repeat { get; set; }
-    public DateTime FistTime;
+    public DateTime FistTime { get; set; }
 }
 
 public class Levels
