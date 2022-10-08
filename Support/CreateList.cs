@@ -10,7 +10,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
-
+using System.Threading;
 
 namespace Support
 {
@@ -24,6 +24,8 @@ namespace Support
         private List<Word> words = new List<Word>();
         public IList<Word> Words
         { get { return words.AsReadOnly(); } }
+
+        private object locker = new object();
 
         //private String adress = "https://www.oxfordlearnersdictionaries.com/wordlists/oxford3000-5000";
 
@@ -39,6 +41,26 @@ namespace Support
             Console.WriteLine();
             CreateListWords();
             Console.WriteLine("CreatedListWords, end");
+            words.RandomWord();
+            PrepareDB();
+        }
+
+        private void PrepareDB()
+        {
+            List<string> levels = new List<string>() { "a1", "a2", "b1", "b2", "c1" };
+            Console.WriteLine(words.Count);
+            List<Word> wordstemp = new List<Word>();
+            foreach (string level in levels)
+            {
+                List<Word> wordslevel= words.Where(x=>x.WordEng.Level==level).ToList();
+                Console.WriteLine(wordslevel.Count);
+                wordstemp.AddRange(wordslevel);
+                List<Word> AdditionWords = words.Where(x=>wordslevel.Any(y=>y.WordEng.Level==null&&y.WordEng.Word==x.WordEng.Word)).ToList();
+                Console.WriteLine(AdditionWords.Count);
+                wordstemp.AddRange(AdditionWords);
+            }
+            Console.WriteLine(wordstemp.Count);
+            words = wordstemp;
         }
 
         private void CreateListEngWords()
@@ -50,12 +72,13 @@ namespace Support
             foreach (HtmlNode element in listTag)
             {
                 WordEng word = new WordEng();
+
                 word.Word = element.GetAttributeValue("data-hw", "");
                 word.Level = element.GetAttributeValue("data-ox5000", null) ??
                              element.GetAttributeValue("data-ox3000", null);
                 word.obj = element.ChildNodes.FirstOrDefault(x => x.Name == "span")?.InnerHtml;
                 word.link = FragmentLink(element.ChildNodes.FirstOrDefault(x => x.Name == "a")?.GetAttributeValue("href", null));
-                if (!wordsEng.Any(x=>x.link==word.link))
+                if (wordsEng!=null&&!wordsEng.Any(x=>x.link==word.link))
                 {
                     wordsEng.Add(word);
                 }
@@ -69,14 +92,38 @@ namespace Support
             int index = 1,count= wordsEng.Count;
             foreach (WordEng element in wordsEng)
             {
-                WriteInHtmlEng writeInHtml = new WriteInHtmlEng(element);
-                var collection = writeInHtml.WordEngAdd;
-                foreach (WordEng element2 in collection)
-                {
-                    if (!additionaList.Any(x=>x.link==element2.link)&& !wordsEng.Any(x => x.link == element2.link))
-                        additionaList.Add(element2);
-                }
+                CreateListAdditional(element);
                 Console.WriteLine($"\r{index++}/{count}");
+            }
+        }
+
+        private void CreateTaskListAdditional(WordEng[] arrayWordEng)
+        {
+            if (arrayWordEng)
+        }
+        private void F1(WordEng[] arrayWordEng)
+        {
+            if (arrayWordEng!=null&&arrayWordEng.Length>0)
+            { 
+            Task[] tasks = new Task[arrayWordEng.Length];
+            for (int i = 0; i < arrayWordEng.Length; i++)
+            {
+                tasks[i] = new Task(() => CreateListAdditional(arrayWordEng[i]));
+                tasks[i].Start();
+            }
+            Task.WaitAll(tasks);
+            }
+        }
+
+
+        private void CreateListAdditional(WordEng element)
+        {
+            WriteInHtmlEng writeInHtml = new WriteInHtmlEng(element);
+            var collection = writeInHtml.WordEngAdd;
+            foreach (WordEng element2 in collection)
+            {
+                if (!additionaList.Any(x => x.link == element2.link) && !wordsEng.Any(x => x.link == element2.link))
+                    additionaList.Add(element2);
             }
         }
 

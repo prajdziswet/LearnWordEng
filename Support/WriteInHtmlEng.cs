@@ -58,20 +58,18 @@ namespace Support
 
                 htmlDoc.GetElementbyId("ring-links-box")?.Remove();
 
-                if(addition != null)
-                foreach (var element in addition)
-                {
-                    AddWord(element);
-                }
+                if (addition != null)
+                    foreach (var element in addition)
+                    {
+                        AddWord(element);
+                    }
                 htmlNode.ReplaceLinkWithoutHost("https://www.oxfordlearnersdictionaries.com/");
 
                 returntext = htmlNode.OuterHtml;
                 returntext = Regex.Replace(returntext, "<div class=\"symbols.+?div>", "<span class=\"star-btn\" aria-hidden=\"true\">​</span>");
             }
 
-
-
-            return returntext;
+            return DeleteMarkImage(returntext);
         }
 
         private void AddWord(HtmlNode element)

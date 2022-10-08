@@ -11,9 +11,11 @@ namespace EnglishWord7000.Controllers
     public class HomeController : Controller
     {
         private IRepeatWordPage repeatWordPage;
-        public HomeController(IRepeatWordPage repeatWordPage)
+        public HomeController(IRepeatWordPage repeatWordPage,AplicationContext DB)
         {
             this.repeatWordPage = repeatWordPage;
+            CreateList createList = new CreateList();
+
         }
 
         public IActionResult Index()

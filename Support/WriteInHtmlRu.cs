@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
 using HtmlAgilityPack;
 
 namespace Support;
@@ -24,7 +25,6 @@ public class WriteInHtmlRu
         if (response != null)
         {
             HtmlRu = NormolaziRU(response);
-            AdditionListRu();
         }
     }
 
@@ -61,61 +61,74 @@ public class WriteInHtmlRu
         htmlNode.CheakAndRemove("//*[@id=\"add_to_dict\"]");
         htmlNode.CheakAndRemove("//*[@id=\"other_dict\"]");
         htmlNode.CheakAndRemove("//*[@id=\"personal_ex_block\"]");
-        SetlistRu(htmlNode);
+        
         htmlNode.ReplaceLinkWithoutHost("https://wooordhunt.ru/");
-        return htmlNode.OuterHtml;
+        CreateList(DeleteWordNeedTranslate(htmlNode.OuterHtml));
+        return DeleteWordNeedTranslate(htmlNode.OuterHtml);
     }
 
-    private void SetlistRu(HtmlNode htmlNode)
+    private void CreateList(string html)
     {
-        HtmlNodeCollection collOriginal= htmlNode.SelectNodes("//p[@class='ex_o']");
-        HtmlNodeCollection collTranslate = htmlNode.SelectNodes("//p[@class='ex_t human']");
-
-        if (collOriginal != null && collTranslate != null)
-        {
-            string ru, eng;
-            for (int i = 0; i < collOriginal.Count && i < collTranslate.Count; i++)
-            {
-                eng = collOriginal[i].InnerText;
-                ru = collTranslate[i].InnerText;
-                if (!eng.IsNullOrEmpty() && !ru.IsNullOrEmpty())
-                {
-                    CheckWord newCheckWord = new CheckWord();
-                    newCheckWord.RuPhrase = ru;
-                    newCheckWord.EngPhrase = eng;
-                    CheckWords.Add(newCheckWord);
-                }
-            }
-        }
+        CheckWords.AddRange(ReturnList(html));
+        //AdditionListRu();
     }
 
-    private void AdditionListRu()
-    {
-        string adress = $"https://context.reverso.net/translation/english-russian/{wordEng}";
-if (adress.ExitURL()) {
-        Requst requst = new Requst($"https://context.reverso.net/translation/english-russian/{wordEng}");
-        string response = requst.Response;
-        HtmlDocument htmlDoc = new HtmlDocument();
-        htmlDoc.LoadHtml(response);
-        HtmlNode htmlNode = htmlDoc.DocumentNode.SelectSingleNode("//*[@id=\"examples-content\"]");
-        HtmlNodeCollection collAll = htmlNode.SelectNodes("//div[contains(@class,'example')]");
-        if (collAll!=null)
-        foreach (HtmlNode Block in collAll)
-        {
-            string eng = Block.SelectSingleNode("//div[@class='src ltr']").InnerText;
-            string ru = Block.SelectSingleNode("//div[@class='trg ltr']").InnerText;
-            if (!eng.IsNullOrEmpty() && !ru.IsNullOrEmpty())
-            {
-                CheckWord newCheckWord = new CheckWord();
-                newCheckWord.RuPhrase = ru;
-                newCheckWord.EngPhrase = eng;
-                CheckWords.Add(newCheckWord);
-            }
-        }
+
+    //I don't why don't work. Maybe, change on site..
+
+    //private void SetlistRu(HtmlNode htmlNode)
+    //{
+    //    Console.WriteLine(htmlNode.OuterHtml);
+    //    HtmlNodeCollection collOriginal= htmlNode.SelectNodes("//p[@class='ex_o']");
+    //    HtmlNodeCollection collTranslate = htmlNode.SelectNodes("//p[@class='ex_t human']");
+
+    //    if (collOriginal != null && collTranslate != null)
+    //    {
+    //        string ru, eng;
+    //        for (int i = 0; i < collOriginal.Count && i < collTranslate.Count; i++)
+    //        {
+    //            eng = collOriginal[i].InnerText;
+    //            ru = collTranslate[i].InnerText;
+    //            if (!eng.IsNullOrEmpty() && !ru.IsNullOrEmpty())
+    //            {
+    //                CheckWord newCheckWord = new CheckWord();
+    //                newCheckWord.RuPhrase = ru;
+    //                newCheckWord.EngPhrase = eng;
+    //                CheckWords.Add(newCheckWord);
+    //            }
+    //        }
+    //    }
+    //}
+
+    //    ..Forbiten
+
+    //    private void AdditionListRu()
+    //    {
+    //        string adress = $"https://context.reverso.net/translation/english-russian/{wordEng}";
+    //if (adress.ExitURL()) {
+    //        Requst requst = new Requst($"https://context.reverso.net/translation/english-russian/{wordEng}");
+    //        string response = requst.Response;
+    //        HtmlDocument htmlDoc = new HtmlDocument();
+    //        htmlDoc.LoadHtml(response);
+    //        HtmlNode htmlNode = htmlDoc.DocumentNode.SelectSingleNode("//*[@id=\"examples-content\"]");
+    //        HtmlNodeCollection collAll = htmlNode.SelectNodes("//div[contains(@class,'example')]");
+    //        if (collAll!=null)
+    //        foreach (HtmlNode Block in collAll)
+    //        {
+    //            string eng = Block.SelectSingleNode("//div[@class='src ltr']").InnerText;
+    //            string ru = Block.SelectSingleNode("//div[@class='trg ltr']").InnerText;
+    //            if (!eng.IsNullOrEmpty() && !ru.IsNullOrEmpty())
+    //            {
+    //                CheckWord newCheckWord = new CheckWord();
+    //                newCheckWord.RuPhrase = ru;
+    //                newCheckWord.EngPhrase = eng;
+    //                CheckWords.Add(newCheckWord);
+    //            }
+    //        }
 
 
-        }
-    }
+    //        }
+    //    }
 
     public static string DeleteWordNeedTranslate(string wordRu)
     {
@@ -129,7 +142,7 @@ if (adress.ExitURL()) {
 
         var divCollection = Regex.Matches(html, @"<div class=""ex.*?"".*?>(.*?)<\/div>");
         bool block = false;
-        if (divCollection != null)
+        if (divCollection == null)
         {
             divCollection= Regex.Matches(html, @"<div class=""block phra.*?>(.*?)<\/div>");
             block = true;

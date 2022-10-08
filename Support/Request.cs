@@ -65,6 +65,7 @@ namespace Support
             }
             catch (Exception)
             {
+                throw;
             }
 
         }
