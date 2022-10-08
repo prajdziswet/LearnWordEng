@@ -97,25 +97,6 @@ namespace Support
             }
         }
 
-        private void CreateTaskListAdditional(WordEng[] arrayWordEng)
-        {
-            if (arrayWordEng)
-        }
-        private void F1(WordEng[] arrayWordEng)
-        {
-            if (arrayWordEng!=null&&arrayWordEng.Length>0)
-            { 
-            Task[] tasks = new Task[arrayWordEng.Length];
-            for (int i = 0; i < arrayWordEng.Length; i++)
-            {
-                tasks[i] = new Task(() => CreateListAdditional(arrayWordEng[i]));
-                tasks[i].Start();
-            }
-            Task.WaitAll(tasks);
-            }
-        }
-
-
         private void CreateListAdditional(WordEng element)
         {
             WriteInHtmlEng writeInHtml = new WriteInHtmlEng(element);
