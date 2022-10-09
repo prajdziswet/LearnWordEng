@@ -82,7 +82,7 @@ namespace Support
                 {
                     wordsEng.Add(word);
                 }
-                //if (wordsEng.Count==2) break;
+                if (wordsEng.Count==2) break;
             }
             Console.WriteLine(wordsEng.Count);
         }
@@ -92,19 +92,26 @@ namespace Support
             int index = 1,count= wordsEng.Count;
             foreach (WordEng element in wordsEng)
             {
-                CreateListAdditional(element);
+                CreateListAdditional(element, additionaList);
                 Console.WriteLine($"\r{index++}/{count}");
             }
         }
 
-        private void CreateListAdditional(WordEng element)
+        private void CreateListAdditional(WordEng element,List<WordEng> additionaListRezult)
         {
-            WriteInHtmlEng writeInHtml = new WriteInHtmlEng(element);
-            var collection = writeInHtml.WordEngAdd;
-            foreach (WordEng element2 in collection)
+            try
             {
-                if (!additionaList.Any(x => x.link == element2.link) && !wordsEng.Any(x => x.link == element2.link))
-                    additionaList.Add(element2);
+                WriteInHtmlEng writeInHtml = new WriteInHtmlEng(element);
+                var collection = writeInHtml.WordEngAdd;
+                foreach (WordEng element2 in collection)
+                {
+                    if (!additionaListRezult.Any(x => x.link == element2.link) && !wordsEng.Any(x => x.link == element2.link))
+                        additionaListRezult.Add(element2);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 

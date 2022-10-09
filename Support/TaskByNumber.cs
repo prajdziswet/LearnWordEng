@@ -6,64 +6,133 @@ using System.Threading.Tasks;
 
 namespace Support
 {
-    public class TaskByNumber
+    public class TaskByNumberAdditionalList
     {
-        private Action<WordEng> action;
         private int NumberStream;
-        private WordEng[] wordsSource;
+        public List<WordEng> trySecond=new List<WordEng>();
+        public List<WordEng> RezultList=new List<WordEng>();
+        private WordEng[] wordsEng;
         private Task[] tasks;
-        public TaskByNumber(Action<WordEng> action,WordEng[] words,int NumberStream)
+        private bool first=true;
+        private object locker=new object();
+        private int count=0;
+        private int index=0;
+        public TaskByNumberAdditionalList(List<WordEng> wordsEngList, int NumberStream=4)
         {
-            this.action = action;
+            if (wordsEngList == null || wordsEngList.Count == 0) throw new ArgumentNullException();
+            wordsEng = wordsEngList.ToArray();
+            if (NumberStream <= 1) NumberStream = 2;
             this.NumberStream=NumberStream;
-            wordsSource = words;
-            tasks = new Task[words.Length];
+            CreateList();
         }
 
         private void CreateTask()
         {
-            for (int i = 0; i < NumberStream; i++)
+            WordEng[] words;
+            if (first)
             {
-                tasks[i] = new Task(() => action(arrayWordEng[i]));
-            }
-        }
-        public void Start()
-        {
-            if (NumberStream > wordsSource.Length)
-            {
-                for (int i = 0; i < NumberStream; i++)
-                {
-                    tasks[i].Start();
-                }
+                words=wordsEng;
             }
             else
             {
+                words = trySecond.ToArray();
+            }
+
+                tasks = new Task[words.Length];
+                CreateTask(words);
+        }
+
+        private void CreateTask(WordEng[] words)
+        {
+            if (words.Length <= NumberStream)
+                for (int i = 0; i < NumberStream && i < words.Length; i++)
+                {
+                    tasks[i] = new Task(() => CreateListAdditional(words[i]));
+                }
+            else
+            {
+                    for (int i1 = 0; i1 < words.Length; i1++)
+                    {
+                    if (i1 < NumberStream)
+                        tasks[i1] = new Task(() => CreateListAdditional(words[i1]));
+                    else
+                    {
+                        tasks[i1] = tasks[i1 - NumberStream].ContinueWith(task => CreateListAdditional(words[i1]));
+                    }
+                    }
 
             }
         }
 
-        private void F1(WordEng[] arrayWordEng)
+        private void Wait()
         {
-            if (arrayWordEng != null && arrayWordEng.Length > 0)
+            Task.WaitAll(tasks);
+        }
+
+        public void CreateList()
+        {
+            CreateTask();
+            count = wordsEng.Length;
+            Start((NumberStream>wordsEng.Length)? wordsEng.Length:NumberStream);
+            Wait();
+            //try Second and try not Stream
+            if (trySecond.Count>0)
             {
-                Task[] tasks = new Task[arrayWordEng.Length];
-                for (int i = 0; i < arrayWordEng.Length; i++)
+                first = false;
+                index = 0; count = trySecond.Count;
+                CreateTask();
+                int number = (NumberStream > trySecond.Count) ? trySecond.Count : NumberStream;
+                trySecond = new List<WordEng>();
+                Start(number);
+                Wait();
+                if (trySecond.Count > 0)
                 {
-                    tasks[i] = new Task(() => action(arrayWordEng[i]));
+                    index = 0;count = trySecond.Count;
+                    WordEng[] lastNotStream= trySecond.ToArray();
+                    trySecond = new List<WordEng>();
+                    foreach (WordEng lastWordEng in lastNotStream)
+                    {
+                        CreateListAdditional(lastWordEng);
+                    }
+                }
+             }
+        }
+
+        private void Start(int Lengt)
+        {
+                for (int i = 0; i < Lengt; i++)
+                {
                     tasks[i].Start();
                 }
-                Task.WaitAll(tasks);
+        }
+
+        private void CreateListAdditional(WordEng element)
+        {
+            try
+            {
+                WriteInHtmlEng writeInHtml = new WriteInHtmlEng(element);
+                var collection = writeInHtml.WordEngAdd;
+                foreach (WordEng element2 in collection)
+                {
+                    lock(locker)
+                    if (!RezultList.Any(x => x.link == element2.link) && !wordsEng.Any(x => x.link == element2.link))
+                        RezultList.Add(element2);
+                }
+            }
+            catch (Exception)
+            {
+                lock (locker) trySecond.Add(element);
+                throw;
+            }
+            finally
+            {
+                lock (locker)
+                {
+                    Console.Clear();
+                    index++;
+                    Console.WriteLine(index + "//" + count);
+                }
             }
         }
-        //private void CreateListAdditional(WordEng element)
-        //{
-        //    WriteInHtmlEng writeInHtml = new WriteInHtmlEng(element);
-        //    var collection = writeInHtml.WordEngAdd;
-        //    foreach (WordEng element2 in collection)
-        //    {
-        //        if (!additionaList.Any(x => x.link == element2.link) && !wordsEng.Any(x => x.link == element2.link))
-        //            additionaList.Add(element2);
-        //    }
-        //}
     }
 }
