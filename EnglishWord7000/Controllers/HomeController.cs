@@ -11,10 +11,19 @@ namespace EnglishWord7000.Controllers
     public class HomeController : Controller
     {
         private IRepeatWordPage repeatWordPage;
-        public HomeController(IRepeatWordPage repeatWordPage,AplicationContext DB)
+        public HomeController(IRepeatWordPage repeatWordPage)
         {
             this.repeatWordPage = repeatWordPage;
-            Console.WriteLine(DB.Words.Count());
+            //List<Word> words = DB.Words.Include(x => x.WordRu).Include(x => x.CheckWords).ToList();
+            //foreach (Word element in words)
+            //{
+            //    if (element.CheckWords.Count == 0)
+            //    {
+            //        element.CheckWords = WriteInHtmlRu.ReturnList(element.WordRu.HtmlRu);
+            //    }
+            //}
+
+            //DB.SaveChanges();
         }
 
         public IActionResult Index()

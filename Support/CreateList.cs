@@ -42,7 +42,7 @@ namespace Support
             Console.WriteLine();
             CreateListWords();
             Console.WriteLine("CreatedListWords, end");
-            SetIndexWordRU();
+            //SetIndexWordRU();
             words.ShuffleInPlace();
             PrepareDB();
         }
@@ -65,15 +65,15 @@ namespace Support
             words = wordstemp;
         }
 
-        private void SetIndexWordRU()
-        {
-            int i = 0;
-            foreach (Word element in words)
-            {
-                element.WordRu.Id = ++i;
-                element.WordRu.WordId = element.Id;
-            }
-        }
+        //private void SetIndexWordRU()
+        //{
+        //    int i = 0;
+        //    foreach (Word element in words)
+        //    {
+        //        element.WordRu.Id = ++i;
+        //        element.WordRu.WordId = element.Id;
+        //    }
+        //}
         private void CreateListEngWords()
         {
             //CreateGetRequest();getRequst.Response
@@ -95,7 +95,7 @@ namespace Support
                     word.Id = ++IndexEng;
                     wordsEng.Add(word);
                 }
-                if (wordsEng.Count==2) break;
+                //if (wordsEng.Count==2) break;
             }
             Console.WriteLine(wordsEng.Count);
         }
@@ -141,14 +141,33 @@ namespace Support
             {
                 Word newWord;
                 Word word = Words.FirstOrDefault(x => x.WordEng.Word == element.Word && x.WordRu != null);
-                if (word==null) newWord = new Word(element);
+                if (word == null)
+                {
+                    newWord = new Word(element);
+                }
                 else
-                newWord = new Word(element, word.WordRu, word.CheckWords);
+                {
+                    newWord = new Word(element,word.WordRu,word.CheckWords);
+                }
                 ///////////////////////////////
                 words.Add(newWord);
-                element.WordId =words.Count;
                 Console.Write($"\r{index++}/{count}");
             }
+        }
+
+        private List<CheckWord> CreateCheckWords(List<CheckWord> CheckWords)
+        {
+            List<CheckWord> retTemp = new List<CheckWord>();
+            int Index = words.Sum(x => x.CheckWords.Count);
+            int WordId = words.Count;
+            foreach (CheckWord elem in CheckWords)
+            {
+                CheckWord newCheckWord = new CheckWord()
+                    { Id = ++Index, EngPhrase = elem.EngPhrase, RuPhrase = elem.RuPhrase };
+                retTemp.Add(newCheckWord);
+            }
+
+            return retTemp;
         }
 
         string tempreturnOxford()

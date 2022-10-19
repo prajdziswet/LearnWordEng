@@ -47,6 +47,7 @@ namespace EnglishWord7000.Services
             {
                 SetCountFist();
                 SetIdWord();
+                SetWord();
                 SetCookies();
             }
         }
