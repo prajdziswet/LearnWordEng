@@ -14,8 +14,7 @@ namespace EnglishWord7000.Controllers
         public HomeController(IRepeatWordPage repeatWordPage,AplicationContext DB)
         {
             this.repeatWordPage = repeatWordPage;
-            CreateList createList = new CreateList();
-
+            Console.WriteLine(DB.Words.Count());
         }
 
         public IActionResult Index()

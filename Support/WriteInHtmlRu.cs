@@ -17,10 +17,13 @@ public class WriteInHtmlRu
     private string wordEng { get; }
     private string HtmlRu { get; }
     public List<CheckWord> CheckWords { get;}= new List<CheckWord>();
+    private int wordId;
+    private static int indexCheckWord=0;
 
-    public WriteInHtmlRu (string word)
+    public WriteInHtmlRu (string word,int WordId)
     {
         wordEng=word;
+        this.wordId = WordId;
         string response = getResponse();
         if (response != null)
         {
@@ -136,7 +139,7 @@ public class WriteInHtmlRu
         return Regex.Replace(wordRu, regex,"");
     }
 
-    public static List<CheckWord> ReturnList(string html)
+    public List<CheckWord> ReturnList(string html)
     {
         List<CheckWord> retList =new List<CheckWord>();
 
@@ -166,7 +169,7 @@ public class WriteInHtmlRu
                                     eng= (element.Groups[1].Value.IndexOf(">") >= 0) ? element.Groups[1].Value.Remove(0, element.Groups[1].Value.IndexOf(">")) : element.Groups[1].Value;
                                     else eng= element.Groups[1].Value;
                                 string ru = element.Groups[2].Value;
-                                CheckWord checkWord=new CheckWord(){EngPhrase = eng,RuPhrase = ru};
+                                CheckWord checkWord=new CheckWord(){EngPhrase = eng,RuPhrase = ru,WordId = wordId,Id = ++indexCheckWord};
                                 retList.Add(checkWord);
                             }
                     }

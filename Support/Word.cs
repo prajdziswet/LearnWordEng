@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -12,9 +13,11 @@ namespace Support
 {
     public class CheckWord
     {
-        public int Id { get; set; }
+        [Key]
+        public int Id { get; set; } 
         public string EngPhrase { get; set; }
         public string RuPhrase { get; set; }
+        public int? WordId { get; set; }
         //private static int Count = 0;
         //public CheckWord()
         //{
@@ -24,12 +27,14 @@ namespace Support
 
     public class WordEng
     {
+        [Key]
         public int Id { get; set; }
-        public String link { get; set; }
-        public String Word { get; set; }
-        public String obj { get; set; }
-        public String Level { get; set; }
-        public String HtmlEng { get; set; }
+        public String? link { get; set; }
+        public String? Word { get; set; }
+        public String? obj { get; set; }
+        public String? Level { get; set; }
+        public String? HtmlEng { get; set; }
+        public int WordId { get; set; }
         //private static int Count=0;
         //public WordEng()
         //{
@@ -39,11 +44,14 @@ namespace Support
 
     public class Translate
     {
-        public int Id { get; set; }
+        [Key]
+        public int Id { get; set; } 
         public String WordEng { get; set; }
         public String HtmlRu { get; set; }
-
+        public int? WordId { get; set; }
         //private static int Count = 0;
+        public Translate()
+        {}
 
         public Translate (string wordEng, string htmlRu)
         {
@@ -57,14 +65,15 @@ namespace Support
     {
 
         [Key]
-        public int Id { get; set; }
+        public int Id { get; set; } 
         public WordEng WordEng { get; set; }
         public Translate WordRu { get; set; }
         public List<CheckWord> CheckWords { get; set; }
 
-        private static int Count = 0;
+        //private static int Count = 0;
 
-        public Word(){ 
+        public Word()
+        {
             //Id = ++Count; 
         }
 
@@ -78,8 +87,8 @@ namespace Support
 
         public Word(WordEng wordEng,Translate translate=null, List<CheckWord> checkWords=null)
         {
-            //Id = ++Count;
             WordEng = wordEng;
+            Id = wordEng.Id;
 
             if (translate != null)
             {
@@ -88,7 +97,7 @@ namespace Support
             }
             else
             {
-                WriteInHtmlRu rus = new WriteInHtmlRu(wordEng.Word);
+                WriteInHtmlRu rus = new WriteInHtmlRu(wordEng.Word,Id);
                 WordRu = rus.Translate;
                 CheckWords=rus.CheckWords;
             }

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Xml.Linq;
 
 namespace Support
 {
@@ -25,7 +26,7 @@ namespace Support
         public IList<Word> Words
         { get { return words.AsReadOnly(); } }
 
-        private object locker = new object();
+        private static int IndexEng=0;
 
         //private String adress = "https://www.oxfordlearnersdictionaries.com/wordlists/oxford3000-5000";
 
@@ -41,7 +42,8 @@ namespace Support
             Console.WriteLine();
             CreateListWords();
             Console.WriteLine("CreatedListWords, end");
-            words.RandomWord();
+            SetIndexWordRU();
+            words.ShuffleInPlace();
             PrepareDB();
         }
 
@@ -55,7 +57,7 @@ namespace Support
                 List<Word> wordslevel= words.Where(x=>x.WordEng.Level==level).ToList();
                 Console.WriteLine(wordslevel.Count);
                 wordstemp.AddRange(wordslevel);
-                List<Word> AdditionWords = words.Where(x=>wordslevel.Any(y=>y.WordEng.Level==null&&y.WordEng.Word==x.WordEng.Word)).ToList();
+                List<Word> AdditionWords = words.Where(x=>wordslevel.Any(y=>x.WordEng.Level==null&&y.WordEng.Word==x.WordEng.Word)).ToList();
                 Console.WriteLine(AdditionWords.Count);
                 wordstemp.AddRange(AdditionWords);
             }
@@ -63,6 +65,15 @@ namespace Support
             words = wordstemp;
         }
 
+        private void SetIndexWordRU()
+        {
+            int i = 0;
+            foreach (Word element in words)
+            {
+                element.WordRu.Id = ++i;
+                element.WordRu.WordId = element.Id;
+            }
+        }
         private void CreateListEngWords()
         {
             //CreateGetRequest();getRequst.Response
@@ -80,6 +91,8 @@ namespace Support
                 word.link = FragmentLink(element.ChildNodes.FirstOrDefault(x => x.Name == "a")?.GetAttributeValue("href", null));
                 if (wordsEng!=null&&!wordsEng.Any(x=>x.link==word.link))
                 {
+                    ///////////////////////////////
+                    word.Id = ++IndexEng;
                     wordsEng.Add(word);
                 }
                 if (wordsEng.Count==2) break;
@@ -89,29 +102,35 @@ namespace Support
 
         private void CreateListAdditional()
         {
-            int index = 1,count= wordsEng.Count;
-            foreach (WordEng element in wordsEng)
-            {
-                CreateListAdditional(element, additionaList);
-                Console.WriteLine($"\r{index++}/{count}");
-            }
+            TaskByNumberAdditionalList taskBy = new TaskByNumberAdditionalList(wordsEng, wordsEng.Count,8);
+            List<WordEng> additionaList1=taskBy.RezultList;
+            if (additionaList1!=null&& additionaList1.Count>0) additionaList= additionaList1;
         }
 
-        private void CreateListAdditional(WordEng element,List<WordEng> additionaListRezult)
+        private void CreateListAdditionalOld()
         {
-            try
+            foreach (WordEng elemEng in wordsEng)
             {
-                WriteInHtmlEng writeInHtml = new WriteInHtmlEng(element);
-                var collection = writeInHtml.WordEngAdd;
-                foreach (WordEng element2 in collection)
+                try
                 {
-                    if (!additionaListRezult.Any(x => x.link == element2.link) && !wordsEng.Any(x => x.link == element2.link))
-                        additionaListRezult.Add(element2);
+                    WriteInHtmlEng writeInHtml = new WriteInHtmlEng(elemEng);
+                    var collection = writeInHtml.WordEngAdd;
+                    foreach (WordEng element2 in collection)
+                    {
+                            if (!additionaList.Any(x => x.link == element2.link) &&
+                                !wordsEng.Any(x => x.link == element2.link))
+                            {
+                                ////////////////////////////////////////
+                                element2.Id = ++IndexEng;
+                                additionaList.Add(element2);
+                            }
+                    }
                 }
-            }
-            catch (Exception)
-            {
-                throw;
+                catch (Exception)
+                {
+                    Console.WriteLine("Error"+elemEng);
+                    throw;
+                }
             }
         }
 
@@ -124,8 +143,10 @@ namespace Support
                 Word word = Words.FirstOrDefault(x => x.WordEng.Word == element.Word && x.WordRu != null);
                 if (word==null) newWord = new Word(element);
                 else
-                newWord = new Word(element,word.WordRu,word.CheckWords);
+                newWord = new Word(element, word.WordRu, word.CheckWords);
+                ///////////////////////////////
                 words.Add(newWord);
+                element.WordId =words.Count;
                 Console.Write($"\r{index++}/{count}");
             }
         }

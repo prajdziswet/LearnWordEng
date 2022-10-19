@@ -17,13 +17,16 @@ namespace Support
         private object locker=new object();
         private int count=0;
         private int index=0;
-        public TaskByNumberAdditionalList(List<WordEng> wordsEngList, int NumberStream=4)
+        private int CountIndex;
+        public TaskByNumberAdditionalList(List<WordEng> wordsEngList, int countIndex, int NumberStream=4)
         {
+            CountIndex=countIndex;
             if (wordsEngList == null || wordsEngList.Count == 0) throw new ArgumentNullException();
             wordsEng = wordsEngList.ToArray();
             if (NumberStream <= 1) NumberStream = 2;
             this.NumberStream=NumberStream;
             CreateList();
+            Wait();
         }
 
         private void CreateTask()
@@ -47,17 +50,19 @@ namespace Support
             if (words.Length <= NumberStream)
                 for (int i = 0; i < NumberStream && i < words.Length; i++)
                 {
-                    tasks[i] = new Task(() => CreateListAdditional(words[i]));
+                    WordEng wordEng = words[i];
+                    tasks[i] = new Task(() => CreateListAdditional(wordEng));
                 }
             else
             {
                     for (int i1 = 0; i1 < words.Length; i1++)
                     {
+                        WordEng wordEng = words[i1];
                     if (i1 < NumberStream)
-                        tasks[i1] = new Task(() => CreateListAdditional(words[i1]));
+                        tasks[i1] = new Task(() => CreateListAdditional(wordEng));
                     else
                     {
-                        tasks[i1] = tasks[i1 - NumberStream].ContinueWith(task => CreateListAdditional(words[i1]));
+                        tasks[i1] = tasks[i1 - NumberStream].ContinueWith(task => CreateListAdditional(wordEng));
                     }
                     }
 
@@ -115,8 +120,13 @@ namespace Support
                 foreach (WordEng element2 in collection)
                 {
                     lock(locker)
-                    if (!RezultList.Any(x => x.link == element2.link) && !wordsEng.Any(x => x.link == element2.link))
-                        RezultList.Add(element2);
+                        if (!RezultList.Any(x => x.link == element2.link) &&
+                            !wordsEng.Any(x => x.link == element2.link))
+                        {
+                            ////////////////////////////////////////
+                            element2.Id = ++CountIndex;
+                            RezultList.Add(element2);
+                        }
                 }
             }
             catch (Exception)

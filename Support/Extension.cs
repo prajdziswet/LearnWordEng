@@ -63,30 +63,6 @@ public static class Extension
 
         }
 
-    public static Word RandomWord(this List<Word> list)
-    {
-        if (list == null || list.Count == 0)
-        {
-            throw new ArgumentNullException(nameof(list));
-        }
-
-        if (list.Count == 1)
-        {
-            return list[0];
-        }
-        else
-        {
-
-        // note: creating a Random instance each call may not be correct for you,
-        // consider a thread-safe static instance
-        var r = new Random();
-
-        Word word = list[r.Next(0, list.Count)];
-        list.Remove(word);
-        return word;
-        }
-    }
-
     public static void ShuffleInPlace<T>(this IList<T> source)
     {
         source.ShuffleInPlace(new Random());
