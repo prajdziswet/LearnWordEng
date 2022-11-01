@@ -81,9 +81,9 @@ public class Levels
             case 2:
                 StartLevel = 3013;
                 FinishLevel = 3909;
-                FinishAddWord = 4255; break;
+                FinishAddWord = 4256; break;
             case 3:
-                StartLevel = 4256;
+                StartLevel = 4257;
                 FinishLevel = 5823;
                 FinishAddWord = 6323; break;
             case 4:

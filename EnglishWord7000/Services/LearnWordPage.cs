@@ -14,7 +14,7 @@ namespace EnglishWord7000.Services
         private Levels levels;
         private ISetCookies setCookies;
         private IGetCookies getCookies;
-        private Word word { get;  set; }
+        public Word word { get;  set; }
         private List<Tuple<int, string>> linkAdditionWord;
 
 
@@ -56,7 +56,7 @@ namespace EnglishWord7000.Services
         {
             if (Id!=0)
             {
-            word = Db.Words.Include(x=>x.WordEng).Include(x=>x.CheckWords).Include(x=>x.WordRu).FirstOrDefault(x => x.Id == Id);
+            word = Db.Words.Include(x=>x.WordEng).Include(x=>x.WordRu.CheckWords).Include(x=>x.WordRu).FirstOrDefault(x => x.Id == Id);
 
             if (word!=null) linkAdditionWord = Db.Words.AsNoTracking().Skip(levels.FinishLevel)
                     .Take(levels.FinishAddWord - levels.FinishLevel).Where(x => x.WordEng.Word == word.WordEng.Word)

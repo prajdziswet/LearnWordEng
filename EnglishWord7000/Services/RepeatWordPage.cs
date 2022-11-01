@@ -32,9 +32,9 @@ public class RepeatWordPage: IRepeatWordPage
         if (ExistPage)
         {
             string strReturn = "";
-            if (learnWord == null && learnWord.learnedWord.CheckWords.Count > 0)
+            if (learnWord == null && learnWord.learnedWord.WordRu.CheckWords.Count > 0)
             {
-                foreach (CheckWord element in learnWord.learnedWord.CheckWords)
+                foreach (CheckWord element in learnWord.learnedWord.WordRu.CheckWords)
                 {
                     strReturn += "<div class=\"checkword\"" +
                                  "<span class=\"eng\">" +

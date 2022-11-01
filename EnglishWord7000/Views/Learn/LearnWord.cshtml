@@ -10,6 +10,10 @@
     
 </div>
 <div class="my_buttons">
+    @if (ViewData["level"] != null)
+    {
+        <h1>Level: @ViewData["level"]</h1>
+    }
     @if (@ViewData["Page"] != null)
     {
 

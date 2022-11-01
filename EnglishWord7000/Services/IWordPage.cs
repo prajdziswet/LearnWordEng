@@ -1,4 +1,6 @@
-﻿namespace EnglishWord7000.Services;
+﻿using Support;
+
+namespace EnglishWord7000.Services;
 
 public interface IRepeatWordPage
 {
@@ -11,5 +13,6 @@ public interface ILearnWordPage
 {
     public string GetRawPage(int id = 0);
     public string GetLinkAdditionWords();
+    public Word word { get;}
     public bool Next();
 }

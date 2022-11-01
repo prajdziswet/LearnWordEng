@@ -12,6 +12,7 @@ using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Linq;
+using System.Reflection.Emit;
 
 namespace Support
 {
@@ -20,13 +21,11 @@ namespace Support
         private HtmlDocument htmlDoc = new HtmlDocument();
 
         private List<WordEng> wordsEng = new List<WordEng>();
-        private List<WordEng> additionaList=new List<WordEng>();
+        private List<WordEng> additionaList = new List<WordEng>();
 
         private List<Word> words = new List<Word>();
         public IList<Word> Words
         { get { return words.AsReadOnly(); } }
-
-        private static int IndexEng=0;
 
         //private String adress = "https://www.oxfordlearnersdictionaries.com/wordlists/oxford3000-5000";
 
@@ -52,12 +51,13 @@ namespace Support
             List<string> levels = new List<string>() { "a1", "a2", "b1", "b2", "c1" };
             Console.WriteLine(words.Count);
             List<Word> wordstemp = new List<Word>();
+
             foreach (string level in levels)
             {
-                List<Word> wordslevel= words.Where(x=>x.WordEng.Level==level).ToList();
+                List<Word> wordslevel = words.Where(x => x.WordEng.Level == level).ToList();
                 Console.WriteLine(wordslevel.Count);
                 wordstemp.AddRange(wordslevel);
-                List<Word> AdditionWords = words.Where(x=>wordslevel.Any(y=>x.WordEng.Level==null&&y.WordEng.Word==x.WordEng.Word)).ToList();
+                List<Word> AdditionWords = words.Where(x => x.WordEng.Level != level && wordslevel.Select(x => x.WordEng.Word).Contains(x.WordEng.Word)).ToList();
                 Console.WriteLine(AdditionWords.Count);
                 wordstemp.AddRange(AdditionWords);
             }
@@ -65,15 +65,6 @@ namespace Support
             words = wordstemp;
         }
 
-        //private void SetIndexWordRU()
-        //{
-        //    int i = 0;
-        //    foreach (Word element in words)
-        //    {
-        //        element.WordRu.Id = ++i;
-        //        element.WordRu.WordId = element.Id;
-        //    }
-        //}
         private void CreateListEngWords()
         {
             //CreateGetRequest();getRequst.Response
@@ -89,10 +80,9 @@ namespace Support
                              element.GetAttributeValue("data-ox3000", null);
                 word.obj = element.ChildNodes.FirstOrDefault(x => x.Name == "span")?.InnerHtml;
                 word.link = FragmentLink(element.ChildNodes.FirstOrDefault(x => x.Name == "a")?.GetAttributeValue("href", null));
-                if (wordsEng!=null&&!wordsEng.Any(x=>x.link==word.link))
+                if (wordsEng != null && !wordsEng.Any(x => x.link == word.link))
                 {
                     ///////////////////////////////
-                    word.Id = ++IndexEng;
                     wordsEng.Add(word);
                 }
                 //if (wordsEng.Count==2) break;
@@ -102,9 +92,9 @@ namespace Support
 
         private void CreateListAdditional()
         {
-            TaskByNumberAdditionalList taskBy = new TaskByNumberAdditionalList(wordsEng, wordsEng.Count,8);
-            List<WordEng> additionaList1=taskBy.RezultList;
-            if (additionaList1!=null&& additionaList1.Count>0) additionaList= additionaList1;
+            TaskByNumberAdditionalList taskBy = new TaskByNumberAdditionalList(wordsEng, wordsEng.Count, 8);
+            List<WordEng> additionaList1 = taskBy.RezultList;
+            if (additionaList1 != null && additionaList1.Count > 0) additionaList = additionaList1;
         }
 
         private void CreateListAdditionalOld()
@@ -117,18 +107,17 @@ namespace Support
                     var collection = writeInHtml.WordEngAdd;
                     foreach (WordEng element2 in collection)
                     {
-                            if (!additionaList.Any(x => x.link == element2.link) &&
-                                !wordsEng.Any(x => x.link == element2.link))
-                            {
-                                ////////////////////////////////////////
-                                element2.Id = ++IndexEng;
-                                additionaList.Add(element2);
-                            }
+                        if (!additionaList.Any(x => x.link == element2.link) &&
+                            !wordsEng.Any(x => x.link == element2.link))
+                        {
+                            ////////////////////////////////////////
+                            additionaList.Add(element2);
+                        }
                     }
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Error"+elemEng);
+                    Console.WriteLine("Error" + elemEng);
                     throw;
                 }
             }
@@ -147,7 +136,7 @@ namespace Support
                 }
                 else
                 {
-                    newWord = new Word(element,word.WordRu,word.CheckWords);
+                    newWord = new Word(element, word.WordRu, word.WordRu.CheckWords);
                 }
                 ///////////////////////////////
                 words.Add(newWord);
@@ -158,12 +147,11 @@ namespace Support
         private List<CheckWord> CreateCheckWords(List<CheckWord> CheckWords)
         {
             List<CheckWord> retTemp = new List<CheckWord>();
-            int Index = words.Sum(x => x.CheckWords.Count);
-            int WordId = words.Count;
+
             foreach (CheckWord elem in CheckWords)
             {
                 CheckWord newCheckWord = new CheckWord()
-                    { Id = ++Index, EngPhrase = elem.EngPhrase, RuPhrase = elem.RuPhrase };
+                { EngPhrase = elem.EngPhrase, RuPhrase = elem.RuPhrase };
                 retTemp.Add(newCheckWord);
             }
 
@@ -172,7 +160,7 @@ namespace Support
 
         string tempreturnOxford()
         {
-            using (StreamReader stream=new StreamReader($"{Directory.GetCurrentDirectory()}\\Oxsford.txt"))
+            using (StreamReader stream = new StreamReader($"{Directory.GetCurrentDirectory()}\\Oxsford.txt"))
             {
                 return stream.ReadToEnd();
             }

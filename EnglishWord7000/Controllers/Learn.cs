@@ -53,6 +53,7 @@ namespace EnglishWord7000.Controllers
             @ViewData["Page"] = learnWordPage.GetRawPage(id);
             @ViewData["id"] = id;
             @ViewData["listAddition"] = learnWordPage.GetLinkAdditionWords();
+            @ViewData["level"] = learnWordPage.word.WordEng.Level;
         }
 
         public IActionResult Repeat(bool boolit=false)

@@ -14,9 +14,10 @@ namespace Support
     public class CheckWord
     {
         [Key]
-        public int Id { get; set; } 
+        public int Id { get; set; }
         public string EngPhrase { get; set; }
         public string RuPhrase { get; set; }
+        public int? TranslateId { get; set; }
     }
 
     public class WordEng
@@ -28,18 +29,21 @@ namespace Support
         public String obj { get; set; }
         public String Level { get; set; }
         public String HtmlEng { get; set; }
+        public int? WordId { get; set; }
     }
 
     public class Translate
     {
         [Key]
-        public int Id { get; set; } 
+        public int Id { get; set; }
         public String WordEng { get; set; }
         public String HtmlRu { get; set; }
+        public List<CheckWord> CheckWords { get; set; }
+        public List<Word> Words { get; set; }
         public Translate()
-        {}
+        { }
 
-        public Translate (string wordEng, string htmlRu)
+        public Translate(string wordEng, string htmlRu)
         {
             //Id = ++Count;
             WordEng = wordEng;
@@ -51,18 +55,18 @@ namespace Support
     {
 
         [Key]
-        public int Id { get; set; } 
+        public int Id { get; set; }
         public WordEng WordEng { get; set; }
         public Translate WordRu { get; set; }
-        public List<CheckWord> CheckWords { get; set; }
 
+        public int TranslateId { get; set; }
 
         public Word()
         {
         }
 
 
-        public Word(WordEng wordEng,Translate translate=null, List<CheckWord> checkWords=null)
+        public Word(WordEng wordEng, Translate translate = null, List<CheckWord> checkWords = null)
         {
             WordEng = wordEng;
             Id = wordEng.Id;
@@ -70,13 +74,13 @@ namespace Support
             if (translate != null)
             {
                 WordRu = translate;
-                CheckWords=checkWords;
+                WordRu.CheckWords = checkWords;
             }
             else
             {
                 WriteInHtmlRu rus = new WriteInHtmlRu(wordEng.Word);
                 WordRu = rus.Translate;
-                CheckWords=rus.CheckWords;
+                WordRu.CheckWords = rus.CheckWords;
             }
         }
 
